@@ -1,0 +1,368 @@
+---
+title: <center> <h1>Simulation Study to evaluate the quality of the estimations in Flexible Weibull extension regression</h1> </center>
+author: <center>Sara Garcés Céspedes</center>
+date: <center>21/3/2020</center>
+output: 
+  html_document:
+    number_sections: yes
+    theme: spacelab
+    toc: yes
+    toc_float:
+      collapsed: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<br>
+
+# Why are you here?
+
+<div class=text-justify>
+Welcome, you are here to learn how to perform a simulation study using R to evaluate the quality of the estimations in Flexible Weibull extension regression. So let's get started...
+</div>
+
+<br>
+
+# The Flexible Weibull extension distribution
+
+<div class=text-justify>
+The Flexible Weibull extension (FWE) distribution was proposed by Bebbington, Lai and Zikitis in 2007. This distribution has two parameters $\mu$ and $\sigma$ and its probability density function is given by:
+</div>
+
+$$
+f(x;\mu,\sigma)= \left(\mu+\frac{\sigma}{x^{2}}\right)e^{\left(\mu x - \frac{\sigma}{x}\right)}\exp\left(-e^{\mu x - \frac{\sigma}{x}}\right),
+$$
+
+where $\mu>0$ and $\sigma>0$. If a random variable X follows a Flexible Weibull extension distribution, we denote it as $X \sim FWE(\mu, \sigma)$.
+
+If you want to learn more about this distribution, check this article: [A flexible Weibull extension](https://www.sciencedirect.com/science/article/abs/pii/S095183200600072X) 
+
+<br>
+
+# RelDists package
+
+<div class=text-justify>
+__RelDists__ is an R package with  several distributions useful for reliability analysis. Also, with this package it is possible to estimate parameters and fit regression models within GAMLSS framework. The current version of the package is hosted in GitHub and any user could download it using the next code:
+</div>
+
+```{r, eval=FALSE}
+if (!require('devtools')) install.packages('devtools')
+devtools::install_github('ousuga/RelDists', force=TRUE)
+require(RelDists)
+```
+
+<center>
+<div>
+![](C:/Users\ASUS\Desktop\SEGUNDO SEMESTRE\TECNICAS COMPUTACIONALES\PARCIALES\PARCIAL 3\RELDIST.PNG)
+</div>
+</center>
+
+If you want more information about the package visit [the website](https://ousuga.github.io/RelDists/).
+
+<br>
+
+# Simulation study
+
+<div class=text-justify>
+Now we are going to perform a Monte Carlo simulation study to evaluate the quality of the estimations in Flexible Weibull extension regression without covariates, with covariates and censored data, using the __RelDists__ package. For the evaluation of the performance of the estimation, we use the mean value, the Bias and the Mean Squared Error (MSE) of the estimator, which are given by:
+</div>
+
+\begin{align*}
+Mean &= \frac{\sum_{i=1}^{k}\hat{\theta_i}}{k},\\
+Bias &= \frac{\sum_{i=1}^{k}(\hat{\theta_i}-\theta)}{k},\\
+MSE &= \frac{\sum_{i=1}^{k}(\hat{\theta_i}-\theta)^{2}}{k},\\
+\end{align*}
+
+where $\theta$ corresponds to the parameter that we want to estimate, \hat{\theta_i} is the estimator and $k$ is the number of simulations we want to perform. 
+
+## Model without covariates
+
+In the first part of the simulation study we are going to generate data from the next model:
+
+\begin{align*}
+y_i &\sim FWE(\mu, \sigma),\\
+\mu &= 0.21,\\
+\sigma &= 0.25.
+\end{align*}
+
+<div class=text-justify>
+We are going to consider different scenarios in which the sample size $n$ and the percentage of censored data $pcd$ vary, that is, we consider $n=20, 30, 40, . . . , 280, 290, 300$ and $pcd=0.00, 0.10, 0.20, 0.30, 0.40, 0.50$ and follow the next steps to simulate the data and estimate the parameters $\mu$ and $\sigma$:
+</div>
+
+1. Generate a sample of size $n$ from $FWE(\mu=0.21, \sigma=0.25)$.
+
+2. Modify the simulated random sample to ensure a $pcd \times 100 \%$ of right-censored observations.
+
+3. Obtain and store the estimations $\hat{\mu}$ and $\hat{\sigma}$ using the proposed procedure.
+
+4. Repeat $k = 10000$ times the steps 1 to 3.
+
+
+## Model with covariates
+
+In the second part of the simulation study we are going to generate data from the next model:
+
+\begin{align*}
+y_i &\sim FWE(\mu, \sigma),\\
+\log(\mu_i) &= \beta_0 + \beta_1 \times X_{1i},\\
+\log(\sigma_i) &= \gamma_0 + \gamma_1 \times X_{2i},\\
+X_1 &\sim U(0,1),\\
+X_2 &\sim U(0,1),\\
+\end{align*}
+
+<div class=text-justify>
+where $\beta_0=-2$, $\beta_1=0.9$, $\gamma_0=2$ and $\gamma_1=-6.7$. Just like for the first part of the simulation study, we consider $n=20, 30, 40, . . . , 280, 290, 300$ and $pcd=0.00, 0.10, 0.20, 0.30, 0.40, 0.50$ and follow the next steps to simulate the data and estimate the parameters  $\beta_0$, $\beta_1$, $\gamma_0$ and $\gamma_1$: 
+</div>
+
+1. Generate a sample of size $n$ from the model presented above.
+
+2. Modify the simulated random sample to ensure a $pcd \times 100 \%$ of right-censored observations.
+
+3. Obtain and store the estimations  $\hat{\beta_0}$, $\hat{\beta_1}$, $\hat{\gamma_0}$ and $\hat{\gamma_1}$ using the proposed procedure.
+
+4. Repeat $k = 10000$ times the steps 1 to 3.
+
+<br>
+
+# Results
+
+## Model without covariates
+
+<div class=text-justify>
+The next graphs show us the mean value of the estimator of $\mu$ and $\sigma$ for each combination of parameters $pcd$ and $n$. We can observe that for both parameters, the mean value of the estimator tends to get closer to the real value of the parameter as the sample size $n$ increases, regardless of the value of $pcd$.  On the other hand, for parameter $\sigma$, the behavior of the mean value of the estimator is very similar for the different values of $n$ and $pcd$, while for the parameter $\mu$, with small values of the percentage of censored data $pcd$, the mean value of the estimator approaches the true value of the parameter faster.
+</div>
+
+```{r,  eval=TRUE, echo=FALSE, fig.align="center", message=FALSE, warning=FALSE}
+
+library(readr)
+
+simul_without_cov <- read_table2("C:/Users/ASUS/Desktop/SEGUNDO SEMESTRE/TECNICAS COMPUTACIONALES/PARCIALES/PARCIAL 3/PUNTO 4/punto 4 parcial/simul_without_cov.txt", col_names = FALSE)
+
+datos <- simul_without_cov
+
+library(dplyr)
+
+#eliminar nas
+datosnew <- na.omit(datos)
+#eliminar observacion rara
+datosnew2 <- datosnew[datosnew$X1 < 100,]
+
+resfinal <- datosnew2 %>% group_by(X3, X4) %>% summarise(media.mu=mean(X1), 
+                                                     media.sigma=mean(X2), 
+                                                     ecm.mu=mean((X1-0.21)^2),
+                                                     ecm.sigma=mean((X2-0.25)^2),
+                                                     bias.mu=mean(0.21-X1),
+                                                     bias.sigma=mean(0.25-X2)) 
+
+
+
+#PROMEDIOS
+library(ggplot2)
+colnames(resfinal) <- c('n', 'pcd', 'media.mu', 'media.sigma', 'ecm.mu', 'ecm.sigma',
+                        'bias.mu', 'bias.sigma')
+
+resfinal$pcd <- as.factor(resfinal$pcd)
+
+library(gridExtra)
+
+p1 <- ggplot(data=resfinal, aes(x=n, y=media.mu)) +
+        geom_point() + geom_line(aes(color=pcd)) + 
+        geom_hline(yintercept = 0.21, linetype="dashed", size=0.9, colour="black") +
+        labs(x='n', y=expression(paste("Mean ", mu)))
+
+p2 <- ggplot(data=resfinal, aes(x=n, y=media.sigma)) +
+        geom_point() + geom_line(aes(color=pcd)) + 
+        geom_hline(yintercept = 0.25, linetype="dashed", size=0.9, colour="black") +
+        labs(x='n', y=expression(paste("Mean ", sigma)))
+
+grid.arrange(p1, p2, ncol = 2)
+```
+
+<br>
+
+<div class=text-justify>
+The next graphs show us the MSE of the estimator of $\mu$ and $\sigma$ for each combination of parameters $pcd$ and $n$. We can observe that for both parameters, the MSE of the estimator tends to get closer to zero as the sample size $n$ increases, regardless of the value of $pcd$. On the other hand, for parameter $\sigma$, the behavior of the MSE is very similar for the different values of $n$ and $pcd$, while for the parameter $\mu$, with small values of the percentage of censored data $pcd$, the MSE of the estimator approaches zero faster. 
+</div>
+
+```{r,  eval=TRUE, echo=FALSE, fig.align="center", message=FALSE, warning=FALSE}
+p1 <- ggplot(data=resfinal, aes(x=n, y=ecm.mu)) +
+        geom_point() + geom_line(aes(color=pcd)) + 
+        geom_hline(yintercept = 0, linetype="dashed", size=0.9, colour="black") +
+        labs(x='n', y=expression(paste("MSE ", mu)))
+
+p2 <- ggplot(data=resfinal, aes(x=n, y=ecm.sigma)) +
+        geom_point() + geom_line(aes(color=pcd)) + 
+        geom_hline(yintercept = 0, linetype="dashed", size=0.9, colour="black") +
+        labs(x='n', y=expression(paste("MSE ", sigma)))
+
+
+grid.arrange(p1, p2, ncol = 2)
+```
+
+<br>
+
+<div class=text-justify>
+The next graphs show us the Bias of the estimator of $\mu$ and $\sigma$ for each combination of parameters $pcd$ and $n$. We can observe that for both parameters, the Bias of the estimator tends to get closer to zero as the sample size $n$ increases, regardless of the value of $pcd$. On the other hand, for parameter $\sigma$, the behavior of the Bias is very similar for the different values of $n$ and $pcd$, however, with $pcd=0.5$ the behavior varies a little. For the parameter $\mu$, with small values of the percentage of censored data $pcd$, the Bias of the estimator approaches zero faster. 
+</div>
+
+```{r,  eval=TRUE, echo=FALSE, fig.align="center", message=FALSE, warning=FALSE}
+
+p1 <- ggplot(data=resfinal, aes(x=n, y=bias.mu)) +
+        geom_point() + geom_line(aes(color=pcd)) + 
+        geom_hline(yintercept = 0, linetype="dashed", size=0.9, colour="black") +
+        labs(x='n', y=expression(paste("Bias ", mu)))
+
+p2 <- ggplot(data=resfinal, aes(x=n, y=bias.sigma)) +
+        geom_point() + geom_line(aes(color=pcd)) + 
+        geom_hline(yintercept = 0, linetype="dashed", size=0.9, colour="black") +
+        labs(x='n', y=expression(paste("Bias ", sigma)))
+
+
+grid.arrange(p1, p2, ncol = 2)
+```
+
+<br>
+
+## Model with covariates
+
+<div class=text-justify>
+The next graphs show us the mean value of the estimator of $\beta_0$, $\beta_1$, $\gamma_0$ and $\gamma_1$ for each combination of parameters $pcd$ and $n$. We observe that for parameters $\gamma_0$ and $\gamma_1$, the mean value of the estimator tends to get closer to the real value of the parameter as the sample size $n$ increases, when $pcd<0.5$. On the other hand, for parameters $\beta_0$ and $\beta_1$, the mean value of the estimator tends to get closer to the real value of the parameter as the sample size $n$ increases, when $pcd<0.4$. For all the parameters, when working with large values of the percentage of censored data $pcd$, the mean value of the estimator deviates significantly from the real value of the parameter, especially in the case of $\beta_0$ and $\beta_1$. 
+</div>
+
+```{r,  eval=TRUE, echo=FALSE, fig.align="center", message=FALSE, warning=FALSE}
+library(readr)
+
+simul_with_cov <- read_table2("simul_with_cov.txt", col_names = FALSE)
+datos <- simul_with_cov
+
+library(dplyr)
+library(gridExtra)
+#eliminar nas
+datosnew <- na.omit(datos)
+#eliminar observacion rara
+datosnew2 <- datosnew[datosnew$X1 < 100 & datosnew$X1 > -100,]
+datosnew3 <- datosnew2[datosnew2$X2 < 100 & datosnew2$X2 > -100,]
+datosnew4 <- datosnew3[datosnew3$X3 < 100 & datosnew3$X3 > -100,]
+datosnew5 <- datosnew4[datosnew4$X4 < 100 & datosnew4$X4 > -100,]
+
+resfinal2 <- datosnew5 %>% group_by(X5, X6) %>% summarise(media.beta0=mean(X1), 
+                                                         media.beta1=mean(X2), 
+                                                         media.ro=mean(X3),
+                                                         media.ro1=mean(X4),
+                                                         ecm.beta0=mean((X1-(-2))^2),
+                                                         ecm.beta1=mean((X2-0.9)^2),
+                                                         ecm.ro0=mean((X3-2)^2),
+                                                         ecm.ro1=mean((X4-(-6.7))^2),
+                                                         bias.beta0=mean((-2)-X1),
+                                                         bias.beta1=mean(0.9-X2),
+                                                         bias.ro0=mean(2-X3),
+                                                         bias.ro1=mean((-6.7)-X4)) 
+
+
+#PROMEDIOS
+library(ggplot2)
+colnames(resfinal2) <- c('n', 'pcd', 'media.beta0', 'media.beta1', 'media.ro0', 'media.ro1', 
+                         'ecm.beta0', 'ecm.beta1', 'ecm.ro0', 'ecm.ro1',
+                        'bias.beta0', 'bias.beta1', 'bias.ro0', 'bias.ro1')
+
+resfinal2$pcd <- as.factor(resfinal2$pcd)
+
+p1 <- ggplot(data=resfinal2, aes(x=n, y=media.beta0)) +
+        geom_point() + geom_line(aes(color=pcd)) + 
+        geom_hline(yintercept = -2, linetype="dashed", size=0.9, colour="black") +
+        labs(x='n', y=expression(paste("Mean ", beta[0])))
+
+p2 <- ggplot(data=resfinal2, aes(x=n, y=media.beta1)) +
+        geom_point() + geom_line(aes(color=pcd)) + 
+        geom_hline(yintercept = 0.9, linetype="dashed", size=0.9, colour="black") +
+        labs(x='n', y=expression(paste("Mean ", beta[1])))
+
+p3 <- ggplot(data=resfinal2, aes(x=n, y=media.ro0)) +
+        geom_point() + geom_line(aes(color=pcd)) + 
+        geom_hline(yintercept = 2, linetype="dashed", size=0.9, colour="black") +
+        labs(x='n', y=expression(paste("Mean ", gamma[0])))
+
+p4 <- ggplot(data=resfinal2, aes(x=n, y=media.ro1)) +
+        geom_point() + geom_line(aes(color=pcd)) + 
+        geom_hline(yintercept = -6.7, linetype="dashed", size=0.9, colour="black") +
+        labs(x='n', y=expression(paste("Mean ", gamma[1])))
+
+
+grid.arrange(p1, p2, p3, p4, ncol = 2, nrow = 2)
+```
+
+<br>
+
+<div class=text-justify>
+The next graphs show us the MSE of the estimator of $\beta_0$, $\beta_1$, $\gamma_0$ and $\gamma_1$ for each combination of parameters $pcd$ and $n$. We observe that for parameters $\gamma_0$ and $\gamma_1$, the MSE of the estimator tends to get closer to zero as the sample size $n$ increases, regardless of the value of $pcd$. On the other hand, for parameters $\beta_0$ and $\beta_1$, the MSE of the estimator tends to get closer to zero as the sample size $n$ increases when $pcd<0.4$. When $pcd>0.4$, the MSE deviates significantly from zero.
+</div>
+
+```{r,  eval=TRUE, echo=FALSE, fig.align="center", message=FALSE, warning=FALSE}
+p1 <- ggplot(data=resfinal2, aes(x=n, y=ecm.beta0)) +
+        geom_point() + geom_line(aes(color=pcd)) + 
+        geom_hline(yintercept = 0, linetype="dashed", size=0.9, colour="black") +
+        labs(x='n', y=expression(paste("MSE ", beta[0])))
+
+p2 <- ggplot(data=resfinal2, aes(x=n, y=ecm.beta1)) +
+        geom_point() + geom_line(aes(color=pcd)) + 
+        geom_hline(yintercept = 0, linetype="dashed", size=0.9, colour="black") +
+        labs(x='n', y=expression(paste("MSE ", beta[1])))
+
+p3 <- ggplot(data=resfinal2, aes(x=n, y=ecm.ro0)) +
+        geom_point() + geom_line(aes(color=pcd)) + 
+        geom_hline(yintercept = 0, linetype="dashed", size=0.9, colour="black") +
+        labs(x='n', y=expression(paste("MSE ", gamma[0])))
+
+p4 <- ggplot(data=resfinal2, aes(x=n, y=ecm.ro1)) +
+        geom_point() + geom_line(aes(color=pcd)) + 
+        geom_hline(yintercept = 0, linetype="dashed", size=0.9, colour="black") +
+        labs(x='n', y=expression(paste("MSE ", gamma[1])))
+
+grid.arrange(p1, p2, p3, p4, ncol = 2, nrow = 2)
+```
+
+<br>
+
+<div class=text-justify>
+The next graphs show us the Bias of the estimator of $\beta_0$, $\beta_1$, $\gamma_0$ and $\gamma_1$ for each combination of parameters $pcd$ and $n$. We observe that for parameters $\gamma_0$ and $\gamma_1$, the Bias of the estimator tends to get closer zero as the sample size $n$ increases, when $pcd<0.5$. On the other hand, for parameters $\beta_0$ and $\beta_1$, the Bias of the estimator tends to get closer to zero as the sample size $n$ increases when $pcd<0.4$. For all the parameters, when working with large values of the percentage of censored data $pcd$, the Bias of the estimator deviates significantly from zero, especially in the case of $\beta_0$ and $\beta_1$. 
+</div>
+
+```{r,  eval=TRUE, echo=FALSE, fig.align="center", message=FALSE, warning=FALSE}
+p1 <- ggplot(data=resfinal2, aes(x=n, y=bias.beta0)) +
+        geom_point() + geom_line(aes(color=pcd)) + 
+        geom_hline(yintercept = 0, linetype="dashed", size=0.9, colour="black") +
+        labs(x='n', y=expression(paste("Bias ", beta[0])))
+
+p2 <- ggplot(data=resfinal2, aes(x=n, y=bias.beta1)) +
+        geom_point() + geom_line(aes(color=pcd)) + 
+        geom_hline(yintercept = 0, linetype="dashed", size=0.9, colour="black") +
+        labs(x='n', y=expression(paste("Bias ", beta[1])))
+
+p3 <- ggplot(data=resfinal2, aes(x=n, y=bias.ro0)) +
+        geom_point() + geom_line(aes(color=pcd)) + 
+        geom_hline(yintercept = 0, linetype="dashed", size=0.9, colour="black") +
+        labs(x='n', y=expression(paste("Bias ", gamma[0])))
+
+p4 <- ggplot(data=resfinal2, aes(x=n, y=bias.ro1)) +
+        geom_point() + geom_line(aes(color=pcd)) + 
+        geom_hline(yintercept = 0, linetype="dashed", size=0.9, colour="black") +
+        labs(x='n', y=expression(paste("Bias ", gamma[1])))
+
+grid.arrange(p1, p2, p3, p4, ncol = 2, nrow = 2)
+```
+
+<br>
+<br>
+
+<center>**I hope you enjoyed this post and learned about how to perform a simulation study using R. I encourage you to replicate this procedure with other regression models.**</center>
+
+<br>
+
+<center>
+
+<div style="width:200px; height:200px">
+![](C:/Users\ASUS\Desktop\SEGUNDO SEMESTRE\TECNICAS COMPUTACIONALES\PARCIALES\PARCIAL 3\logo.png)
+</div>
+</center>
